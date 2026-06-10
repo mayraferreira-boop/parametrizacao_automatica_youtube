@@ -6,168 +6,158 @@
 <title>Gerador de Links YouTube — QConcursos</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
-    color: #1a1a1a;
-    background: #f5f6f7;
-    padding: 24px 16px;
-    min-height: 100vh;
+    font-size: 14px; color: #1a1a1a; background: #f5f6f7;
+    padding: 24px 16px; min-height: 100vh;
   }
-
   .container {
-    max-width: 860px;
-    margin: 0 auto;
-    background: #fff;
-    border-radius: 10px;
-    border: 1px solid #e0e0e0;
-    padding: 28px 32px 36px;
+    max-width: 860px; margin: 0 auto; background: #fff;
+    border-radius: 10px; border: 1px solid #e0e0e0; padding: 28px 32px 36px;
   }
-
   .header { margin-bottom: 20px; }
   .header h1 { font-size: 20px; font-weight: 600; color: #111; margin-bottom: 4px; }
   .header p { font-size: 13px; color: #666; }
 
-  .campaign-badge {
-    display: inline-flex; align-items: center; gap: 6px;
+  /* Campaign badge */
+  .campaign-bar {
+    display: flex; align-items: center; justify-content: space-between;
     background: #fff8e1; border: 1px solid #ffe082;
-    border-radius: 6px; padding: 6px 12px;
-    font-size: 12px; color: #795548; margin-bottom: 20px;
+    border-radius: 6px; padding: 8px 12px; margin-bottom: 20px; gap: 8px;
   }
-  .campaign-badge strong { color: #4e342e; }
+  .campaign-bar .left { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #795548; }
+  .campaign-bar strong { color: #4e342e; }
+  .btn-admin-open {
+    background: none; border: 1px solid #e0c060; border-radius: 5px;
+    padding: 4px 10px; font-size: 11px; color: #795548; cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-admin-open:hover { background: #fff3cd; }
 
+  /* Admin panel */
+  #admin-panel {
+    display: none; background: #fffbf0; border: 1px solid #ffe082;
+    border-radius: 8px; padding: 16px 18px; margin-bottom: 20px;
+  }
+  #admin-panel h3 { font-size: 13px; font-weight: 600; color: #5d4037; margin-bottom: 10px; }
+  .admin-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+  .admin-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 180px; }
+  .admin-field label { font-size: 11px; font-weight: 500; color: #666; }
+  .btn-admin-save {
+    padding: 8px 16px; background: #F47920; color: #fff;
+    border: none; border-radius: 6px; font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+  }
+  .btn-admin-save:hover { background: #e06810; }
+  .btn-admin-cancel {
+    padding: 8px 12px; background: none; border: 1px solid #d0d0d0;
+    border-radius: 6px; font-size: 13px; cursor: pointer; color: #666;
+  }
+  .btn-admin-cancel:hover { background: #f5f5f5; }
+  .admin-msg { font-size: 12px; margin-top: 8px; display: none; }
+  .admin-msg.ok { color: #2e7d32; }
+  .admin-msg.err { color: #c62828; }
+
+  /* Token gate */
+  #token-gate {
+    background: #f8f9ff; border: 1px solid #d0d8f0;
+    border-radius: 8px; padding: 20px 24px; margin-bottom: 24px;
+  }
+  #token-gate h2 { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px; }
+  #token-gate p { font-size: 12px; color: #666; margin-bottom: 12px; line-height: 1.5; }
+  .token-row { display: flex; gap: 8px; }
+  .token-row input { flex: 1; }
+  .btn-token {
+    padding: 8px 16px; background: #111; color: #fff;
+    border: none; border-radius: 6px; font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+  }
+  .btn-token:hover { background: #333; }
+  .token-error { font-size: 12px; color: #c62828; margin-top: 6px; display: none; }
+  .token-ok {
+    display: none; align-items: center; gap: 8px;
+    background: #e8f5e9; border: 1px solid #a5d6a7;
+    border-radius: 6px; padding: 8px 12px;
+    font-size: 12px; color: #2e7d32; margin-bottom: 20px;
+  }
+  .btn-change-token {
+    background: none; border: none; color: #1a73e8;
+    font-size: 12px; cursor: pointer; padding: 0; margin-left: auto;
+  }
+
+  /* Main form */
+  #main-form { display: none; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
   .form-group { display: flex; flex-direction: column; gap: 4px; }
   .form-group.full { grid-column: 1 / -1; }
   .form-group label { font-size: 12px; font-weight: 500; color: #555; }
-
   input[type="text"], input[type="password"], textarea {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #d0d0d0;
-    border-radius: 6px;
-    font-size: 13px;
-    color: #1a1a1a;
-    background: #fafafa;
-    transition: border-color .15s;
-    font-family: inherit;
+    width: 100%; padding: 8px 10px; border: 1px solid #d0d0d0;
+    border-radius: 6px; font-size: 13px; color: #1a1a1a;
+    background: #fafafa; transition: border-color .15s; font-family: inherit;
   }
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: #F47920;
-    background: #fff;
-  }
+  input:focus, textarea:focus { outline: none; border-color: #F47920; background: #fff; }
   textarea { min-height: 140px; resize: vertical; line-height: 1.5; }
 
   .btn-generate {
-    width: 100%;
-    padding: 11px;
-    background: #F47920;
-    color: #fff;
-    border: none;
-    border-radius: 7px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 4px;
-    transition: background .15s;
+    width: 100%; padding: 11px; background: #F47920; color: #fff;
+    border: none; border-radius: 7px; font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-top: 4px; transition: background .15s;
   }
   .btn-generate:hover { background: #e06810; }
   .btn-generate:disabled { background: #ccc; cursor: not-allowed; }
-
   .status { font-size: 12px; color: #888; margin-top: 8px; min-height: 18px; }
 
   /* Results */
   #results-area { margin-top: 24px; display: none; }
-
   .results-header {
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
   }
   .results-title { font-size: 14px; font-weight: 600; color: #111; }
-
   .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
   .btn-action {
-    padding: 7px 13px;
-    border: 1px solid #d0d0d0;
-    border-radius: 6px;
-    background: #fff;
-    font-size: 12px;
-    cursor: pointer;
-    color: #333;
-    display: flex; align-items: center; gap: 5px;
-    transition: background .1s;
+    padding: 7px 13px; border: 1px solid #d0d0d0; border-radius: 6px;
+    background: #fff; font-size: 12px; cursor: pointer; color: #333;
+    display: flex; align-items: center; gap: 5px; transition: background .1s;
   }
   .btn-action:hover { background: #f5f5f5; }
-  .btn-action.primary-action {
-    background: #111; color: #fff; border-color: #111;
-  }
+  .btn-action.primary-action { background: #111; color: #fff; border-color: #111; }
   .btn-action.primary-action:hover { background: #333; }
 
-  /* Table */
   .table-wrap { overflow-x: auto; border: 1px solid #e8e8e8; border-radius: 8px; }
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   thead th {
-    background: #f8f8f8;
-    text-align: left;
-    padding: 9px 10px;
-    font-weight: 600;
-    font-size: 11px;
-    color: #555;
-    border-bottom: 1px solid #e8e8e8;
-    white-space: nowrap;
+    background: #f8f8f8; text-align: left; padding: 9px 10px;
+    font-weight: 600; font-size: 11px; color: #555;
+    border-bottom: 1px solid #e8e8e8; white-space: nowrap;
   }
   tbody td {
-    padding: 9px 10px;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: top;
-    word-break: break-word;
-    color: #222;
-    line-height: 1.4;
+    padding: 9px 10px; border-bottom: 1px solid #f0f0f0;
+    vertical-align: top; word-break: break-word; color: #222; line-height: 1.4;
   }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: #fafafa; }
-
-  .td-date { width: 72px; white-space: nowrap; color: #666; }
-  .td-title { width: 26%; }
-  .td-term { width: 18%; font-style: italic; color: #888; font-size: 11px; }
-  .td-long { width: 22%; font-size: 11px; }
-  .td-short { width: 13%; }
-  .td-copy { width: 36px; text-align: center; }
-
   .link-short { color: #1a73e8; text-decoration: none; font-size: 11px; word-break: break-all; }
   .link-short:hover { text-decoration: underline; }
   .link-long { color: #888; font-size: 11px; word-break: break-all; }
-
   .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; }
   .badge-loading { background: #f0f0f0; color: #888; }
-  .badge-ok { background: #e8f5e9; color: #2e7d32; }
   .badge-err { background: #fdecea; color: #c62828; }
-
   .copy-cell-btn {
-    background: none; border: 1px solid #e0e0e0;
-    border-radius: 5px; padding: 3px 6px;
-    cursor: pointer; font-size: 11px; color: #666;
-    transition: background .1s;
+    background: none; border: 1px solid #e0e0e0; border-radius: 5px;
+    padding: 3px 6px; cursor: pointer; font-size: 11px; color: #666;
   }
   .copy-cell-btn:hover { background: #f0f0f0; }
 
-  /* Import instructions */
   .import-box {
-    margin-top: 16px;
-    background: #f0f7ff;
-    border: 1px solid #b3d4f5;
-    border-radius: 8px;
-    padding: 14px 16px;
-    display: none;
+    margin-top: 16px; background: #f0f7ff; border: 1px solid #b3d4f5;
+    border-radius: 8px; padding: 14px 16px; display: none;
   }
   .import-box h3 { font-size: 13px; font-weight: 600; color: #1a56a0; margin-bottom: 8px; }
   .import-box ol { padding-left: 18px; line-height: 2; font-size: 13px; color: #333; }
-  .import-box ol li strong { color: #111; }
   .import-box .sheet-link { color: #1a73e8; }
   .import-box .note { font-size: 12px; color: #666; margin-top: 8px; }
-
   .divider { border: none; border-top: 1px solid #ececec; margin: 20px 0; }
 
   @media (max-width: 600px) {
@@ -178,263 +168,351 @@
 </style>
 </head>
 <body>
-
 <div class="container">
   <div class="header">
     <h1>🎬 Gerador de Links YouTube</h1>
     <p>Parametrização automática de UTMs + encurtamento via Bitly + exportação para planilha</p>
   </div>
 
-  <div class="campaign-badge">
-    <span>📣 Campanha vigente:</span>
-    <strong id="campaign-display">qconcursos_acq_convocados_provacao</strong>
+  <!-- Campaign bar -->
+  <div class="campaign-bar">
+    <div class="left">
+      <span>📣 Campanha vigente:</span>
+      <strong id="campaign-display">qconcursos_acq_convocados_aprovacao</strong>
+    </div>
+    <button class="btn-admin-open" onclick="toggleAdmin()">⚙️ Alterar campanha</button>
   </div>
 
-  <div class="form-grid">
-    <div class="form-group">
-      <label>Token Bitly</label>
-      <input type="password" id="bitly-token" value="017a59207080917368eb8f29d2cc33d2e7f9c2e5" />
+  <!-- Admin panel -->
+  <div id="admin-panel">
+    <h3>⚙️ Alterar campanha vigente</h3>
+    <div class="admin-row">
+      <div class="admin-field">
+        <label>Senha admin</label>
+        <input type="password" id="admin-pass" placeholder="Digite a senha..." />
+      </div>
+      <div class="admin-field">
+        <label>Nova campanha</label>
+        <input type="text" id="admin-campaign" placeholder="ex: qconcursos_acq_nova_campanha" />
+      </div>
+      <button class="btn-admin-save" onclick="saveCampaign()">Salvar</button>
+      <button class="btn-admin-cancel" onclick="toggleAdmin()">Cancelar</button>
     </div>
-    <div class="form-group">
-      <label>URL base</label>
-      <input type="text" id="base-url" value="https://www.qconcursos.com/l/cupom-social" />
-    </div>
-    <div class="form-group">
-      <label>UTM Source</label>
-      <input type="text" id="utm-source" value="midia_social" />
-    </div>
-    <div class="form-group">
-      <label>UTM Medium</label>
-      <input type="text" id="utm-medium" value="YouTube" />
-    </div>
-    <div class="form-group full">
-      <label>UTM Campaign — atualize aqui quando a campanha mudar</label>
-      <input type="text" id="utm-campaign" value="qconcursos_acq_convocados_provacao"
-        oninput="document.getElementById('campaign-display').textContent=this.value" />
-    </div>
-    <div class="form-group full">
-      <label>Nome rápido (identificador para a planilha — ex: <em>LIVES JUNHO 2026</em>)</label>
-      <input type="text" id="nome-rapido" placeholder="Ex: LIVES JUNHO 2026" />
-    </div>
-    <div class="form-group full">
-      <label>Eventos — cole aqui no formato: <strong>DD/MM/AAAA &nbsp;&nbsp; Título da live</strong> (uma por linha)</label>
-      <textarea id="events-input" placeholder="10/06/2026	INSS 2026: os temas de Assistência e Previdência que você precisa dominar
-11/06/2026	Banco do Brasil: Matemática Financeira sem complicação e focada na prova
-12/06/2026	TJCE: as classes de palavras que mais confundem candidatos"></textarea>
-    </div>
+    <div class="admin-msg" id="admin-msg"></div>
   </div>
 
-  <button class="btn-generate" id="gen-btn" onclick="generate()">⚡ Gerar e encurtar links</button>
-  <div class="status" id="status"></div>
+  <!-- Token gate -->
+  <div id="token-gate">
+    <h2>🔑 Token do Bitly</h2>
+    <p>Cole o token da conta Bitly do QConcursos para começar. Ele não fica salvo — será pedido a cada nova sessão.</p>
+    <div class="token-row">
+      <input type="password" id="token-input" placeholder="Cole o token aqui..." onkeydown="if(event.key==='Enter')confirmToken()" />
+      <button class="btn-token" onclick="confirmToken()">Confirmar</button>
+    </div>
+    <div class="token-error" id="token-error">Token inválido ou vazio. Verifique e tente novamente.</div>
+  </div>
 
-  <div id="results-area">
-    <hr class="divider" />
-    <div class="results-header">
-      <span class="results-title" id="results-title">Resultados</span>
-      <div class="action-btns">
-        <button class="btn-action primary-action" onclick="downloadCSV()">⬇ Baixar CSV para planilha</button>
-        <button class="btn-action" onclick="copyTSV()">📋 Copiar (colar direto no Sheets)</button>
+  <!-- Token confirmado -->
+  <div class="token-ok" id="token-ok">
+    <span>✅ Token Bitly ativo nesta sessão</span>
+    <button class="btn-change-token" onclick="changeToken()">Trocar token</button>
+  </div>
+
+  <!-- Main form -->
+  <div id="main-form">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>UTM Source</label>
+        <input type="text" id="utm-source" value="midia_social" />
+      </div>
+      <div class="form-group">
+        <label>UTM Medium</label>
+        <input type="text" id="utm-medium" value="YouTube" />
+      </div>
+      <div class="form-group full">
+        <label>URL base</label>
+        <input type="text" id="base-url" value="https://www.qconcursos.com/l/cupom-social" />
+      </div>
+      <div class="form-group full">
+        <label>UTM Campaign</label>
+        <input type="text" id="utm-campaign" value="qconcursos_acq_convocados_aprovacao" />
+      </div>
+      <div class="form-group full">
+        <label>Nome rápido (identificador para a planilha — ex: <em>LIVES JUNHO 2026</em>)</label>
+        <input type="text" id="nome-rapido" placeholder="Ex: LIVES JUNHO 2026" />
+      </div>
+      <div class="form-group full">
+        <label>Eventos — formato: <strong>DD/MM/AAAA &nbsp;&nbsp; Título da live</strong> (uma por linha)</label>
+        <textarea id="events-input" placeholder="10/06/2026	INSS 2026: os temas de Assistência e Previdência que você precisa dominar
+11/06/2026	Banco do Brasil: Matemática Financeira sem complicação e focada na prova"></textarea>
       </div>
     </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th class="td-date">Data</th>
-            <th class="td-title">Título da live</th>
-            <th class="td-term">UTM Term</th>
-            <th class="td-long">URL parametrizada</th>
-            <th class="td-short">Link curto (Bitly)</th>
-            <th class="td-copy"></th>
-          </tr>
-        </thead>
-        <tbody id="result-body"></tbody>
-      </table>
-    </div>
+    <button class="btn-generate" id="gen-btn" onclick="generate()">⚡ Gerar e encurtar links</button>
+    <div class="status" id="status"></div>
 
-    <div class="import-box" id="import-box">
-      <h3>📥 Como adicionar à planilha do Google Sheets</h3>
-      <ol>
-        <li>Clique em <strong>"Baixar CSV para planilha"</strong> acima</li>
-        <li>Abra a <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1UltsBk5Fa1jchpBy-1hJiiO7Dvqb_EASCjQHlugwESU/edit#gid=1313523503" target="_blank">planilha no Google Sheets ↗</a></li>
-        <li>Vá na aba <strong>Qconcursos</strong></li>
-        <li>Clique em <strong>Arquivo → Importar → Fazer upload</strong> do CSV baixado</li>
-        <li>Selecione <strong>"Adicionar ao final da planilha"</strong> e confirme</li>
-      </ol>
-      <p class="note">💡 Dica mais rápida: use <strong>"Copiar"</strong> e cole direto na primeira célula vazia da coluna A na aba Qconcursos.</p>
+    <div id="results-area">
+      <hr class="divider" />
+      <div class="results-header">
+        <span class="results-title" id="results-title">Resultados</span>
+        <div class="action-btns">
+          <button class="btn-action primary-action" onclick="downloadCSV()">⬇ Baixar CSV para planilha</button>
+          <button class="btn-action" onclick="copyTSV()">📋 Copiar (colar direto no Sheets)</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:72px">Data</th>
+              <th style="width:26%">Título da live</th>
+              <th style="width:18%">UTM Term</th>
+              <th style="width:22%">URL parametrizada</th>
+              <th style="width:13%">Link curto (Bitly)</th>
+              <th style="width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="result-body"></tbody>
+        </table>
+      </div>
+      <div class="import-box" id="import-box">
+        <h3>📥 Como adicionar à planilha do Google Sheets</h3>
+        <ol>
+          <li>Clique em <strong>"Baixar CSV para planilha"</strong> acima</li>
+          <li>Abra a <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1UltsBk5Fa1jchpBy-1hJiiO7Dvqb_EASCjQHlugwESU/edit#gid=1313523503" target="_blank">planilha no Google Sheets ↗</a></li>
+          <li>Vá na aba <strong>Qconcursos</strong></li>
+          <li>Clique em <strong>Arquivo → Importar → Fazer upload</strong> do CSV baixado</li>
+          <li>Selecione <strong>"Adicionar ao final da planilha"</strong> e confirme</li>
+        </ol>
+        <p class="note">💡 Dica: use <strong>"Copiar"</strong> e cole direto na primeira célula vazia da coluna A na aba Qconcursos.</p>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-let resultsData = [];
+  // Senha admin — pode trocar por qualquer palavra
+  const ADMIN_PASSWORD = 'qcadmin2026';
+  const STORAGE_KEY = 'qc_campaign_vigente';
 
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[💌\u{1F300}-\u{1FFFF}]/gu, '')
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 4)
-    .join('_');
-}
+  let bitlyToken = '';
+  let resultsData = [];
 
-function parseDate(dateStr) {
-  const parts = dateStr.trim().split('/');
-  if (parts.length >= 2) return parts[0].padStart(2,'0') + '_' + parts[1].padStart(2,'0');
-  return dateStr.replace(/\//g,'_');
-}
+  // Carrega campanha salva no localStorage (persiste entre sessões)
+  function loadCampaign() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const campaign = saved || 'qconcursos_acq_convocados_aprovacao';
+    document.getElementById('campaign-display').textContent = campaign;
+    document.getElementById('utm-campaign').value = campaign;
+  }
 
-function parseEvents(raw) {
-  return raw.trim().split('\n')
-    .filter(l => l.trim())
-    .map(line => {
+  function toggleAdmin() {
+    const panel = document.getElementById('admin-panel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    document.getElementById('admin-msg').style.display = 'none';
+    document.getElementById('admin-pass').value = '';
+    document.getElementById('admin-campaign').value = '';
+  }
+
+  function saveCampaign() {
+    const pass = document.getElementById('admin-pass').value.trim();
+    const newCampaign = document.getElementById('admin-campaign').value.trim();
+    const msg = document.getElementById('admin-msg');
+
+    if (pass !== ADMIN_PASSWORD) {
+      msg.textContent = '❌ Senha incorreta.';
+      msg.className = 'admin-msg err';
+      msg.style.display = 'block';
+      return;
+    }
+    if (!newCampaign) {
+      msg.textContent = '⚠️ Digite o nome da nova campanha.';
+      msg.className = 'admin-msg err';
+      msg.style.display = 'block';
+      return;
+    }
+
+    localStorage.setItem(STORAGE_KEY, newCampaign);
+    document.getElementById('campaign-display').textContent = newCampaign;
+    document.getElementById('utm-campaign').value = newCampaign;
+
+    msg.textContent = '✅ Campanha atualizada para: ' + newCampaign;
+    msg.className = 'admin-msg ok';
+    msg.style.display = 'block';
+
+    setTimeout(() => {
+      toggleAdmin();
+    }, 2000);
+  }
+
+  function confirmToken() {
+    const val = document.getElementById('token-input').value.trim();
+    if (!val) {
+      document.getElementById('token-error').style.display = 'block';
+      return;
+    }
+    bitlyToken = val;
+    document.getElementById('token-error').style.display = 'none';
+    document.getElementById('token-gate').style.display = 'none';
+    document.getElementById('token-ok').style.display = 'flex';
+    document.getElementById('main-form').style.display = 'block';
+  }
+
+  function changeToken() {
+    bitlyToken = '';
+    document.getElementById('token-input').value = '';
+    document.getElementById('token-gate').style.display = 'block';
+    document.getElementById('token-ok').style.display = 'none';
+    document.getElementById('main-form').style.display = 'none';
+    document.getElementById('results-area').style.display = 'none';
+  }
+
+  function slugify(text) {
+    return text.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\x00-\x7F]/g, '')
+      .replace(/[^a-z0-9\s]/g, '')
+      .trim().split(/\s+/).slice(0, 4).join('_');
+  }
+
+  function parseDate(dateStr) {
+    const parts = dateStr.trim().split('/');
+    if (parts.length >= 2) return parts[0].padStart(2,'0') + '_' + parts[1].padStart(2,'0');
+    return dateStr.replace(/\//g,'_');
+  }
+
+  function parseEvents(raw) {
+    return raw.trim().split('\n').filter(l => l.trim()).map(line => {
       const m = line.trim().match(/^(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)\s+(.+)$/);
       if (!m) return null;
       return { date: m[1], title: m[2].trim() };
     }).filter(Boolean);
-}
+  }
 
-function buildUrl(base, source, medium, campaign, term) {
-  const u = new URL(base);
-  u.searchParams.set('utm_source', source);
-  u.searchParams.set('utm_medium', medium);
-  u.searchParams.set('utm_campaign', campaign);
-  u.searchParams.set('utm_term', term);
-  return u.toString();
-}
+  function buildUrl(base, source, medium, campaign, term) {
+    const u = new URL(base);
+    u.searchParams.set('utm_source', source);
+    u.searchParams.set('utm_medium', medium);
+    u.searchParams.set('utm_campaign', campaign);
+    u.searchParams.set('utm_term', term);
+    return u.toString();
+  }
 
-async function shortenBitly(longUrl, token) {
-  try {
-    const res = await fetch('https://api-ssl.bitly.com/v4/shorten', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ long_url: longUrl })
+  async function shortenBitly(longUrl) {
+    try {
+      const res = await fetch('https://api-ssl.bitly.com/v4/shorten', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + bitlyToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ long_url: longUrl })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        return { ok: false, error: err.description || ('HTTP ' + res.status) };
+      }
+      const data = await res.json();
+      return { ok: true, link: data.link };
+    } catch(e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  async function generate() {
+    const base = document.getElementById('base-url').value.trim();
+    const source = document.getElementById('utm-source').value.trim();
+    const medium = document.getElementById('utm-medium').value.trim();
+    const campaign = document.getElementById('utm-campaign').value.trim();
+    const nomeRapido = document.getElementById('nome-rapido').value.trim();
+    const raw = document.getElementById('events-input').value;
+    const events = parseEvents(raw);
+
+    if (!events.length) {
+      document.getElementById('status').textContent = '⚠️ Nenhum evento encontrado. Verifique o formato.';
+      return;
+    }
+
+    const btn = document.getElementById('gen-btn');
+    btn.disabled = true; btn.textContent = 'Processando...';
+    document.getElementById('results-area').style.display = 'none';
+    document.getElementById('import-box').style.display = 'none';
+    resultsData = [];
+
+    const tbody = document.getElementById('result-body');
+    tbody.innerHTML = '';
+    document.getElementById('results-area').style.display = 'block';
+    document.getElementById('results-title').textContent = 'Resultados (' + events.length + ' eventos)';
+
+    for (let i = 0; i < events.length; i++) {
+      const ev = events[i];
+      const term = 'aula_' + slugify(ev.title) + '_' + parseDate(ev.date);
+      const longUrl = buildUrl(base, source, medium, campaign, term);
+      const rowNome = nomeRapido || ('LIVE ' + ev.date);
+
+      document.getElementById('status').textContent = '⏳ Encurtando ' + (i+1) + ' de ' + events.length + '...';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="width:72px;white-space:nowrap;color:#666">${ev.date}</td>
+        <td style="width:26%">${ev.title}</td>
+        <td style="width:18%;font-style:italic;color:#888;font-size:11px">${term}</td>
+        <td style="width:22%"><span class="link-long">${longUrl}</span></td>
+        <td style="width:13%" id="short-${i}"><span class="badge badge-loading">Aguarde...</span></td>
+        <td style="width:36px;text-align:center" id="copy-${i}"></td>
+      `;
+      tbody.appendChild(tr);
+
+      const result = await shortenBitly(longUrl);
+      if (result.ok) {
+        document.getElementById('short-'+i).innerHTML = `<a href="${result.link}" class="link-short" target="_blank">${result.link}</a>`;
+        document.getElementById('copy-'+i).innerHTML = `<button class="copy-cell-btn" onclick="copyOne('${result.link}',this)">📋</button>`;
+        resultsData.push({ date: ev.date, title: ev.title, nomeRapido: rowNome, base, source, medium, campaign, term, longUrl, shortUrl: result.link });
+      } else {
+        document.getElementById('short-'+i).innerHTML = `<span class="badge badge-err">Erro: ${result.error}</span>`;
+        resultsData.push({ date: ev.date, title: ev.title, nomeRapido: rowNome, base, source, medium, campaign, term, longUrl, shortUrl: '' });
+      }
+      await new Promise(r => setTimeout(r, 320));
+    }
+
+    document.getElementById('status').textContent = '✅ Pronto! ' + events.length + ' links gerados.';
+    document.getElementById('import-box').style.display = 'block';
+    btn.disabled = false; btn.textContent = '⚡ Gerar e encurtar links';
+  }
+
+  function copyOne(url, btn) {
+    navigator.clipboard.writeText(url).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return { ok: false, error: err.description || ('HTTP ' + res.status) };
-    }
-    const data = await res.json();
-    return { ok: true, link: data.link };
-  } catch(e) {
-    return { ok: false, error: e.message };
-  }
-}
-
-async function generate() {
-  const token = document.getElementById('bitly-token').value.trim();
-  const base = document.getElementById('base-url').value.trim();
-  const source = document.getElementById('utm-source').value.trim();
-  const medium = document.getElementById('utm-medium').value.trim();
-  const campaign = document.getElementById('utm-campaign').value.trim();
-  const nomeRapido = document.getElementById('nome-rapido').value.trim();
-  const raw = document.getElementById('events-input').value;
-
-  const events = parseEvents(raw);
-  if (!events.length) {
-    document.getElementById('status').textContent = '⚠️ Nenhum evento encontrado. Verifique o formato (data + espaço + título).';
-    return;
   }
 
-  const btn = document.getElementById('gen-btn');
-  btn.disabled = true;
-  btn.textContent = 'Processando...';
-  document.getElementById('results-area').style.display = 'none';
-  document.getElementById('import-box').style.display = 'none';
-  resultsData = [];
-
-  const tbody = document.getElementById('result-body');
-  tbody.innerHTML = '';
-  document.getElementById('results-area').style.display = 'block';
-  document.getElementById('results-title').textContent = 'Resultados (' + events.length + ' eventos)';
-
-  for (let i = 0; i < events.length; i++) {
-    const ev = events[i];
-    const dateSlug = parseDate(ev.date);
-    const titleSlug = slugify(ev.title);
-    const term = 'aula_' + titleSlug + '_' + dateSlug;
-    const longUrl = buildUrl(base, source, medium, campaign, term);
-    const rowNome = nomeRapido || ('LIVE ' + ev.date);
-
-    document.getElementById('status').textContent = '⏳ Encurtando ' + (i+1) + ' de ' + events.length + '...';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="td-date">${ev.date}</td>
-      <td class="td-title">${ev.title}</td>
-      <td class="td-term">${term}</td>
-      <td class="td-long"><span class="link-long">${longUrl}</span></td>
-      <td class="td-short" id="short-${i}"><span class="badge badge-loading">Aguarde...</span></td>
-      <td class="td-copy" id="copy-${i}"></td>
-    `;
-    tbody.appendChild(tr);
-
-    const result = await shortenBitly(longUrl, token);
-
-    if (result.ok) {
-      document.getElementById('short-'+i).innerHTML =
-        `<a href="${result.link}" class="link-short" target="_blank">${result.link}</a>`;
-      document.getElementById('copy-'+i).innerHTML =
-        `<button class="copy-cell-btn" onclick="copyOne('${result.link}',this)" title="Copiar link">📋</button>`;
-      resultsData.push({ date: ev.date, title: ev.title, nomeRapido: rowNome, base, source, medium, campaign, term, longUrl, shortUrl: result.link });
-    } else {
-      document.getElementById('short-'+i).innerHTML =
-        `<span class="badge badge-err">Erro: ${result.error}</span>`;
-      resultsData.push({ date: ev.date, title: ev.title, nomeRapido: rowNome, base, source, medium, campaign, term, longUrl, shortUrl: '' });
-    }
-
-    await new Promise(r => setTimeout(r, 320));
+  function buildRows() {
+    return resultsData.map(r => [r.nomeRapido, r.base, r.source, r.medium, r.campaign, r.term, r.longUrl, r.shortUrl]);
   }
 
-  document.getElementById('status').textContent = '✅ Pronto! ' + events.length + ' links gerados.';
-  document.getElementById('import-box').style.display = 'block';
-  btn.disabled = false;
-  btn.textContent = '⚡ Gerar e encurtar links';
-}
+  function downloadCSV() {
+    if (!resultsData.length) return;
+    const header = 'NOME RÁPIDO,URL ORIGINAL,Source,Medium,Campaign,Term,URL TRACKEADA,LINKS ENCURTADOS';
+    const rows = buildRows().map(cols => cols.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(','));
+    const blob = new Blob(['\uFEFF' + [header, ...rows].join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lives_youtube_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    document.getElementById('import-box').style.display = 'block';
+  }
 
-function copyOne(url, btn) {
-  navigator.clipboard.writeText(url).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = '✓';
-    setTimeout(() => { btn.textContent = orig; }, 1500);
-  });
-}
+  function copyTSV() {
+    if (!resultsData.length) return;
+    navigator.clipboard.writeText(buildRows().map(cols => cols.join('\t')).join('\n')).then(() => {
+      const btn = document.querySelector('[onclick="copyTSV()"]');
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copiado!';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  }
 
-function buildRows() {
-  return resultsData.map(r => [
-    r.nomeRapido, r.base, r.source, r.medium, r.campaign, r.term, r.longUrl, r.shortUrl
-  ]);
-}
-
-function downloadCSV() {
-  if (!resultsData.length) return;
-  const header = 'NOME RÁPIDO,URL ORIGINAL,Source,Medium,Campaign,Term,URL TRACKEADA,LINKS ENCURTADOS';
-  const rows = buildRows().map(cols =>
-    cols.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')
-  );
-  const csv = [header, ...rows].join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'lives_youtube_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-  document.getElementById('import-box').style.display = 'block';
-}
-
-function copyTSV() {
-  if (!resultsData.length) return;
-  const rows = buildRows().map(cols => cols.join('\t'));
-  navigator.clipboard.writeText(rows.join('\n')).then(() => {
-    const btn = document.querySelector('[onclick="copyTSV()"]');
-    const orig = btn.textContent;
-    btn.textContent = '✓ Copiado!';
-    setTimeout(() => { btn.textContent = orig; }, 2000);
-  });
-}
+  // Inicializa campanha ao carregar
+  loadCampaign();
 </script>
 </body>
 </html>
